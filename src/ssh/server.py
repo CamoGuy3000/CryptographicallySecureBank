@@ -2,12 +2,14 @@
 # server.py
 
 import socket
-from ssh.packet import Packet
+import random
+from sys import byteorder
+from ssh.kex import KEX
 
 class SSHServer:
     # what it sounds like.
 
-    def __init__(self, port=54321):
+    def __init__(self, port=12345):
         self._socket = None
         self._host = socket.gethostbyname(socket.gethostname())
         # self._host = "127.0.0.1"
@@ -27,13 +29,33 @@ class SSHServer:
         with conn:
             print("here3")
             print(f"Connected by {addr}")
-            # data = Packet.read_packet(conn)
-            # print(f"Data has length {len(data)} bytes")
-                # data = conn.recv(1024)
-                # if not data:
-                #     break
-                # conn.sendall(data)
+
+            # ephemeral diffie hellman
+            client_dh = int.from_bytes(conn.recv(256), byteorder='big')
+            print(f"Client public DH: {client_dh}")
+            public_dh = KEX.create_key()
+            print(f"My public DH: {public_dh}")
+            conn.sendall(public_dh.to_bytes(256, byteorder='big'))
+            shared_secret = KEX.shared_secret(client_dh)
+            print(f"Shared secret: {shared_secret}")
+
+            # send host public key for verification
+
+
+            # compute session hash
+            client_cookie = conn.recv(256)
+            cookie = random.getrandbits(16).to_bytes(2)
+            conn.sendall(cookie)
+            print(f"Cookies:")
+            print(f"\tClient: {client_cookie}")
+            print(f"\tServer: {cookie}")
+
+            client_payload = KEX.compute_kexinit_payload(client_cookie)
+            server_payload = KEX.compute_kexinit_payload(cookie)
+
+
 
     def stop(self):
         if self._socket is None: return
+        self._socket.shutdown(socket.SHUT_RDWR)
         self._socket.close()

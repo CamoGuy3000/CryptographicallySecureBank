@@ -8,3 +8,4 @@ if __name__ == "__main__":
     print(server._port)
     server.listen()
     server.poll()
+    server.stop()
