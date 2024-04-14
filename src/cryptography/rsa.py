@@ -100,8 +100,9 @@ def decrypt(ctxt, p, q, d):
 
   length = int(recv_msg[len(recv_msg)-1], 2)
   # print(length)
-  message = recv_msg[0:length]
-  print(f"Corrected decrypted message: {message}")
+  message = recv_msg[0:length] # entire message
+  #! ^^^ this is what matches the hashed ptxt
+  print(f"\nCorrected decrypted message: {message}")
   return message
 
 
@@ -109,7 +110,7 @@ def decrypt(ctxt, p, q, d):
 p, q, n, e, d = get_keys(BIT_SIZE)
 # msg = ["01011010", "01001011"]
 msg = generate_random_binary_strings(100, 101)
-# print(msg)
+print(f"msg: {msg}")
 ogmsg = []
 for i in msg:
   ogmsg.append(i)
