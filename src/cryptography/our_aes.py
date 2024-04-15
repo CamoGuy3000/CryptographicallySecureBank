@@ -160,7 +160,11 @@ def aes_decrypt(ctxt, in_key, r):
   for i in range(len(state)):
     state[i] = state[i] ^ r[i]
   
-  return state
+  calc_ptxt = []
+  for i in range(state[len(state)-1]):
+    calc_ptxt.append(bin(state[i])[2:].zfill(8))
+  
+  return calc_ptxt
 
 def aes_verify(r, ctxt, mac):
   mac_inp = ''
@@ -178,10 +182,11 @@ def aes_verify(r, ctxt, mac):
 # r, enc_msg, mac = aes_encrypt(msg, key)
 # print(enc_msg)
 # dec_msg = aes_decrypt(enc_msg, key, r)
+# print(dec_msg)
 
-# for i in range(dec_msg[len(dec_msg)-1]):
-#   print(dec_msg[i], end=" ")
-# print()
+# # for i in range(dec_msg[len(dec_msg)-1]):
+# #   print(dec_msg[i], end=" ")
+# # print()
 # print(aes_verify(r, enc_msg, mac))
 
 

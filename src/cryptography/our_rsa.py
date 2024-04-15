@@ -137,6 +137,7 @@ def rsa_varify(ctxt, r, recv_hash):
 # ctxt = rsa_encrypt(msg, n, e)
 # r, decrypted = rsa_decrypt(ctxt, p, q, d)
 
+# print(f"decrypted message: {decrypted}")
 # print(f"Is the decrypted message correct? {'Yes!' if decrypted == ogmsg else 'No :('}")
 
 # print(rsa_varify(ctxt[1], r, ctxt[2]))
