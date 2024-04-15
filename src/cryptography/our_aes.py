@@ -171,18 +171,18 @@ def aes_verify(r, ctxt, mac):
   return calc_mac == mac
 
 
-msg = ["01001001", "01001110"]
-key = ["10101010"]*16
+# msg = ["01001001", "01001110"]
+# key = ["10101010"]*16
 
 
-r, enc_msg, mac = aes_encrypt(msg, key)
-print(enc_msg)
-dec_msg = aes_decrypt(enc_msg, key, r)
+# r, enc_msg, mac = aes_encrypt(msg, key)
+# print(enc_msg)
+# dec_msg = aes_decrypt(enc_msg, key, r)
 
-for i in range(dec_msg[len(dec_msg)-1]):
-  print(dec_msg[i], end=" ")
-print()
-print(aes_verify(r, enc_msg, mac))
+# for i in range(dec_msg[len(dec_msg)-1]):
+#   print(dec_msg[i], end=" ")
+# print()
+# print(aes_verify(r, enc_msg, mac))
 
 
 # print("\n\n", add_round_key(["10101000", "10101010"], ["01010101", "10110100"]))

@@ -1,3 +1,5 @@
 
 socket_test/test.py
 src/ssh/__pycache__/
+src/cryptography/__pycache__
+src/testing

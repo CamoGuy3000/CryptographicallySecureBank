@@ -114,7 +114,7 @@ def rsa_decrypt(ctxt, p, q, d):
   # print(length)
   message = recv_msg[0:length] # entire message
   #! ^^^ this is what matches the hashed ptxt
-  print(f"Corrected decrypted message: {message}")
+  # print(f"Corrected decrypted message: {message}")
   return recv_calc_r, message
 
 
@@ -126,18 +126,18 @@ def rsa_varify(ctxt, r, recv_hash):
 
 
 
-p, q, n, e, d = get_keys(BIT_SIZE)
-msg = ["01011010", "01001011"]
-# length = 100
-# msg = generate_random_binary_strings(length, length)
-print(f"msg: {msg}")
-ogmsg = []
-for i in msg:
-  ogmsg.append(i)
-ctxt = rsa_encrypt(msg, n, e)
-r, decrypted = rsa_decrypt(ctxt, p, q, d)
+# p, q, n, e, d = get_keys(BIT_SIZE)
+# msg = ["01011010", "01001011"]
+# # length = 100
+# # msg = generate_random_binary_strings(length, length)
+# print(f"msg: {msg}")
+# ogmsg = []
+# for i in msg:
+#   ogmsg.append(i)
+# ctxt = rsa_encrypt(msg, n, e)
+# r, decrypted = rsa_decrypt(ctxt, p, q, d)
 
-print(f"Is the decrypted message correct? {'Yes!' if decrypted == ogmsg else 'No :('}")
+# print(f"Is the decrypted message correct? {'Yes!' if decrypted == ogmsg else 'No :('}")
 
-print(rsa_varify(ctxt[1], r, ctxt[2]))
+# print(rsa_varify(ctxt[1], r, ctxt[2]))
 
