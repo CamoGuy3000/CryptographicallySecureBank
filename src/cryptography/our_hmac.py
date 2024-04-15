@@ -1,11 +1,11 @@
 
-from sha import my_sha1
+from our_sha import my_sha1
 
 
 # Input needs to be two byte strings (b'string_here'), returns a string
 def hmac_sha1(key, message) -> str:
   block_size = 64  # Block size for SHA-1 in bytes
-  print(f"HMAC_SHA1 init: {key} {message}\n")
+  # print(f"HMAC_SHA1 init: {key} {message}\n")
   # Ensure key is block size in length
   if len(key) > block_size:
     key = my_sha1(key)
@@ -34,12 +34,12 @@ def hmac_sha1(key, message) -> str:
   return final_hash
 
 
-secret_key = b'secret_key'
-message = b'Hello'
-hmac_signature = hmac_sha1(secret_key, message)
-print('HMAC-SHA1 hash:', hmac_signature)
+# secret_key = b'secret_key'
+# message = b'Hello'
+# hmac_signature = hmac_sha1(secret_key, message)
+# print('HMAC-SHA1 hash:', hmac_signature)
 
-print(hmac_signature == "f8b6b3ee753fe1d8052cf317b0b4606089c85b19") # with sha 1
+# print(hmac_signature == "f8b6b3ee753fe1d8052cf317b0b4606089c85b19") # with sha 1
 # print(hmac_signature == "52460d22ec7e402dc8c62aeda51ec920") # with md5
 
 # print(sha1(b"hello").hex())
