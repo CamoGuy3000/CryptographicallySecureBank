@@ -1,5 +1,5 @@
 
-from our_sha import my_sha1
+from cryptography.our_sha import my_sha1
 
 
 # Input needs to be two byte strings (b'string_here'), returns a string

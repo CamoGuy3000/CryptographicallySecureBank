@@ -1,8 +1,8 @@
-
 from secrets import randbits
-from our_hmac import hmac_sha1
-from generate_keys import get_keys
-from gen_random_input import generate_random_binary_strings
+# from generate_keys import get_keys
+# from gen_random_input import generate_random_binary_strings
+
+from cryptography.our_hmac import hmac_sha1
 
 BIT_SIZE = 1024
 
@@ -32,15 +32,13 @@ def xor(a, b, length):
 
 
 def format_input(inp : list[str]):
-  # print({f"inp: {inp}"})
-  length = bin(len(inp))[2:]
-  # print(f"len: {length}")
-  length = "0"*(8 - len(length)) + (length)
-  # print(f"len: {length}")
-  padding = randbits(BIT_SIZE - len(inp)*8 - 8)
-  # print(f"padding: {padding}")
+  length = bin(len(inp))[2:] 
+  length = "0"*(8 - len(length)) + (length)     
+  # num of strings in list as binary
+
+  padding = randbits(BIT_SIZE - len(inp)*8 - 8) 
   padding = "0"*(BIT_SIZE - len(inp)*8 - 8 - len(bin(padding)[2:])) + (bin(padding)[2:])
-  # print(f"padding: {padding}")
+  # random padding 
 
   formatted = inp
 
@@ -57,10 +55,13 @@ def format_input(inp : list[str]):
 # n_r and e_r should be positive integers
 # Will return the ctxt, which consists of (encrypted random number, ptxt xor hash(r), hash(ctxt + r))
 def rsa_encrypt(ptxt, n_r, e_r):
+  # convert from bin strs to strs of binary...
+  ptxt = [ format(x, '08b') for x in ptxt ]
+
   fptxt = format_input(ptxt)
   #! r IS CURRENTLY CREATED FORM A PYTHON LIBRARY! CHANGE THIS IF NEEDED
   r: int = randbits(BIT_SIZE) % n_r
-  print(f"init r: {r}")
+  # print(f"init r: {r}")
   hash_input: str = "0"*(BIT_SIZE - len(bin(r)[2:])) + (bin(r)[2:]) # Padded with 0's because of how python formats binary numbers (doesn't include leading 0's)
   hashed_r: str = hash(hash_input)
   bin_hashed_r = (bin(int(hashed_r, 16))[2:130])*8
@@ -81,7 +82,7 @@ def rsa_encrypt(ptxt, n_r, e_r):
   # print(f"hashedptxt: {hashed_ctxt_r}")
 
   # print(f"init r: {r}\nr^e: {re}")
-  ctxt: tuple[int, list, int] = (re, C, hashed_ctxt_r) # create the ctxt
+  ctxt: tuple[int, list, str] = (re, C, hashed_ctxt_r) # create the ctxt
   # print(f"ctxt: {ctxt}\n")
 
   return ctxt
@@ -90,6 +91,9 @@ def rsa_encrypt(ptxt, n_r, e_r):
 # ctxt should be a list of binary strings
 # p, q, and d should be positive integers
 def rsa_decrypt(ctxt, p, q, d):
+  # convert ctxt from bytes to string of binary
+  ctxt = ( ctxt[0], [ format(x, '08b') for x in ctxt[1] ], ctxt[2] )
+
   n = p * q
   recv_calc_r = pow(ctxt[0], d, n)
 
@@ -118,8 +122,10 @@ def rsa_decrypt(ctxt, p, q, d):
   return recv_calc_r, message
 
 
-def rsa_varify(ctxt, r, recv_hash):
+def rsa_verify(ctxt, r, recv_hash):
+  ctxt = [ format(x, '08b') for x in ctxt ]
   hashing = ''.join(str(int(c, 2)) for c in ctxt) + str(r)
+  # hashing = str(int.from_bytes(ctxt)) + str(r)
   if(hash(hashing) == recv_hash):
     return True
   return False

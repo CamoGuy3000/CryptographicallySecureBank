@@ -11,7 +11,7 @@ class KEX:
     generator = 2
 
     # version string
-    version_string = "SSH-2.0-CryptoBank_1.0"
+    version_string = b"SSH-2.0-CryptoBank_1.0"
 
     # alg list
     kex_algorithms = "diffie-hellman-group14-sha1"
