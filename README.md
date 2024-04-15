@@ -3,8 +3,11 @@ Definitally [sic.] secure!
 
 ---
 
-# Installation
+# Setup
+
 TODO
+
+Run src/bank.py and src/atm.py
 
 ---
 
