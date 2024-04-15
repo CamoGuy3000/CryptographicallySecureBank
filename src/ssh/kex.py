@@ -51,6 +51,7 @@ class KEX:
         payload += KEX.pack_string(KEX.languages)
         payload += struct.pack(">B", 0)  # First KEX packet follows
         payload += struct.pack(">I", 0)  # Reserved
+        return payload
 
 
     # client

@@ -5,6 +5,7 @@ import socket
 # import struct
 import random
 from ssh.kex import KEX
+from cryptography.sha import my_sha1
 
 class SSHClient:
     # what it sounds like.
@@ -31,6 +32,10 @@ class SSHClient:
         print(f"Shared secret: {shared_secret}")
 
         # recv host public key for verification
+        server_exp = int.from_bytes(self._socket.recv(3))
+        server_mod = int.from_bytes(self._socket.recv(129))
+        print(f"Bank Exponent: {server_exp}")
+        print(f"Bank Modulus Len: {server_mod}")
 
         # compute session hash
         cookie = random.getrandbits(16).to_bytes(2)
@@ -39,9 +44,16 @@ class SSHClient:
         print(f"Cookies:")
         print(f"\tClient: {cookie}")
         print(f"\tServer: {server_cookie}")
-
         client_payload = KEX.compute_kexinit_payload(cookie)
         server_payload = KEX.compute_kexinit_payload(server_cookie)
+        session_hash = my_sha1(KEX.version_string*2 +
+                               client_payload +
+                               server_payload +
+                               server_exp +
+                               server_mod +
+                               public_dh +
+                               server_dh +
+                               shared_secret)
 
 
 
