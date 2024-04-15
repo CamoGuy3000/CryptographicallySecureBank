@@ -64,10 +64,45 @@ def inv_shift_rows(state):
   ]
 
 
+
+def galois_mult(a, b):
+    p = 0
+    for _ in range(8):
+        if b & 1:
+            p ^= a
+        carry = a & 0x80
+        a <<= 1
+        if carry:
+            a ^= 0x11b  # This is the irreducible polynomial for AES
+        b >>= 1
+    return p & 0xFF
+
 def mix_columns(state):
-  return state
+  columns = [state[i:i+4] for i in range(0, 16, 4)]
+  mixed_cols = []
+
+  for col in columns:
+    mixed_cols.extend([
+      galois_mult(0x02, col[0]) ^ galois_mult(0x03, col[1]) ^ col[2] ^ col[3],
+      col[0] ^ galois_mult(0x02, col[1]) ^ galois_mult(0x03, col[2]) ^ col[3],
+      col[0] ^ col[1] ^ galois_mult(0x02, col[2]) ^ galois_mult(0x03, col[3]),
+      galois_mult(0x03, col[0]) ^ col[1] ^ col[2] ^ galois_mult(0x02, col[3])
+    ])
+
+  return mixed_cols
+
 def inv_mix_columns(state):
-  return state
+  # Multiplication in GF(2^8) with the inverse MixColumns matrix
+  inv_columns = []
+  for i in range(0, 16, 4):
+    col = state[i:i+4]
+    inv_columns.extend([
+      galois_mult(0x0e, col[0]) ^ galois_mult(0x0b, col[1]) ^ galois_mult(0x0d, col[2]) ^ galois_mult(0x09, col[3]),
+      galois_mult(0x09, col[0]) ^ galois_mult(0x0e, col[1]) ^ galois_mult(0x0b, col[2]) ^ galois_mult(0x0d, col[3]),
+      galois_mult(0x0d, col[0]) ^ galois_mult(0x09, col[1]) ^ galois_mult(0x0e, col[2]) ^ galois_mult(0x0b, col[3]),
+      galois_mult(0x0b, col[0]) ^ galois_mult(0x0d, col[1]) ^ galois_mult(0x09, col[2]) ^ galois_mult(0x0e, col[3])
+    ])
+  return inv_columns
 
 def add_round_key(state, key):
   # num_key = [k for k in key]
@@ -130,7 +165,6 @@ def aes_encrypt(ptxt: list[str], key: list[str]):
 
   return rIV, state, mac
   # return encryption
-  #TODO actually make the ctxt correct
   # ctxt = (rIV, encrypted(ptxt xor rIV), hash(ctxt+rIV) (mac))
 
 
