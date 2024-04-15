@@ -12,7 +12,7 @@ BIT_SIZE = 1024
 # Input should be a string
 def hash(a):
   a = bytes(a, "utf-8")
-  a = hmac_sha1(b"hi", a)
+  a = hmac_sha1(b'\x06\xf4L\x91\x88x\xad\xee\x91\x10$\x88\xc6%\x13\xfaS\x0fq*_\x94\xb4\x99\xf5\x14;\xa6\xdfIL6\xe4\xc0M\xb6\x0c\x99\x8bi\xcb\x1fR]\x83/\x08\x93LKh|%\x06"Z\xf2\xf68e\xcc\x15f<', a)
   # print(str(a)[2:-1])
   # print(a)
   return a

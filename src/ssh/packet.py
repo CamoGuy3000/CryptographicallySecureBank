@@ -1,53 +1,25 @@
 #! /usr/bin/env python
 
 import socket
+from cryptography.our_aes import aes_decrypt, aes_encrypt, aes_verify
 
 class Packet:
-    """
-    uint32    packet_length
-    byte      padding_length
-    byte[n1]  payload; n1 = packet_length - padding_length - 1
-    byte[n2]  random padding; n2 = padding_length
-    byte[m]   mac (Message Authentication Code - MAC); m = mac_length
-    """
+
     @staticmethod
-    def read_packet(sock):
-        max_packet_size = 35000
-        block_size = 8 # DEPENDS ON CIPHER BLOCK SIZE
-        first_block = sock.recv(block_size)
-        if len(first_block) < block_size:
-            print("Failed to read from socket.")
-            return
+    def write_packet(sock, data, aes_key, iv, mac_key):
+        (_, ctxt, mac) = aes_encrypt(data, aes_key, iv, mac_key)
+        ctxt_bytes = b''.join([b.to_bytes() for b in ctxt])
+        sock.sendall(ctxt_bytes + mac.encode())
 
-        # TODO : decryption
+    @staticmethod
+    def read_packet(sock, aes_key, iv, mac_key) -> bytes:
+        payload_c = sock.recv(16)
+        payload = b''.join([int(b, 2).to_bytes()
+                            for b in aes_decrypt([ b for b in payload_c ], aes_key, iv)])
+        mac = sock.recv(40).decode()
 
-        packet_length = socket.ntohl(int.from_bytes(first_block[0:4]))
-        if packet_length > max_packet_size:
-            print("too big!")
-            return
-        padding_length = int.from_bytes(first_block[4])
-        
-        bytes_to_read = packet_length - (block_size - 4)
-        packet_remaining = sock.recv(bytes_to_read)
-
-        if len(packet_remaining) != bytes_to_read:
-            print("failed to read")
-            return
-
-        # TODO : decryption
-
-        payload_size = packet_length - padding_length - 1
-        packet = first_block[4:] + packet_remaining
-        payload = packet[:(payload_size)]
-
-        # TODO : packet sequence (for MAC computation)
-
-        # TODO : read MAC
-
-        # TODO : packet object ? ?
-
-
-    def __init__(self, socket):
-        self._socket = socket
-        self._blocksize = 8; # DEPENDS ON clienttoserver CIPHER
-
+        if not aes_verify(iv, [b for b in payload_c], mac, mac_key):
+            print("Failed mac verification")
+            return b''
+            
+        return payload

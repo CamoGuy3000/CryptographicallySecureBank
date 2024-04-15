@@ -51,8 +51,9 @@ def compute_key(K, H, X, session_id, key_size):
     key = my_sha1(K + H + X + session_id)
     key_length = len(key)
     while (key_length < key_size):
-        next_key = my_sha1(K + H + key)
+        next_key = my_sha1(K + H + key.encode())
         key += next_key
         key_length = len(key)
     if key_length > key_size:
         key = key[0:key_size]
+    return key

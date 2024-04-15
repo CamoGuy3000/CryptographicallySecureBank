@@ -1,6 +1,6 @@
 
 from secrets import randbits
-from our_hmac import hmac_sha1
+from cryptography.our_hmac import hmac_sha1
 
 s_box = [
   0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76,
@@ -129,14 +129,18 @@ def format_input(in_ptxt: list[str], key):
 
 # ptxt should be a list of binary strings
 # key  should be a KEY_SIZE length list of binary strings (16, 8 long binary strings)
-def aes_encrypt(ptxt: list[str], key: list[str]):
+def aes_encrypt(ptxt: list[str], key: list[str], iv: list[int], mac_key):
   fptxt, fkey = format_input(ptxt, key) # turn both into list of ints
-  rIV = []
-  for _ in range(len(fptxt)):
-    rIV.append(randbits(8))
+  rIV = iv
+  # rIV = []
+  # for _ in range(len(fptxt)):
+  #   rIV.append(randbits(8))
   # print(rIV, len(rIV))
   for i in range(len(fptxt)):
     fptxt[i] = fptxt[i] ^ rIV[i]
+  # print(f"length of fptxt: {len(fptxt)}")
+  # print(f"length of iv: {len(rIV)}")
+  # print(f"length of fkey: {len(fkey)}")
 
   state = fptxt
   rounds = 10
@@ -157,11 +161,11 @@ def aes_encrypt(ptxt: list[str], key: list[str]):
 
   mac_inp = ""
   # hmac_sha1(b"hi", state+rIV)
-  print(state)
+  # print(state)
   mac_inp += ''.join(str(i) for i in state)
   mac_inp += ''.join(str(i) for i in rIV)
   mac_inp = mac_inp.encode()
-  mac = hmac_sha1(b"hi", mac_inp)
+  mac = hmac_sha1(mac_key, mac_inp)
 
   return rIV, state, mac
   # return encryption
@@ -200,12 +204,12 @@ def aes_decrypt(ctxt, in_key, r):
   
   return calc_ptxt
 
-def aes_verify(r, ctxt, mac):
+def aes_verify(r, ctxt, mac, mac_key):
   mac_inp = ''
   mac_inp += ''.join(str(i) for i in ctxt)
   mac_inp += ''.join(str(i) for i in r)
   mac_inp = mac_inp.encode()
-  calc_mac = hmac_sha1(b"hi", mac_inp)
+  calc_mac = hmac_sha1(mac_key, mac_inp)
   return calc_mac == mac
 
 
